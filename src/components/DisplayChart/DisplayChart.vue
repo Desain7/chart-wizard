@@ -5,35 +5,45 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import { onMounted, type ComponentInternalInstance } from 'vue'
-import { getCurrentInstance, ref, reactive } from 'vue'
+import { getCurrentInstance, ref } from 'vue'
+import { useConfigStore } from '@/stores/chartConfig'
+import { watch } from 'vue'
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance
 const chart = ref<any>(null)
 
-const chartOptions = reactive({
-  title: {
-    text: ''
-  },
-  tooltip: {},
-  xAxis: {
-    data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-  },
-  yAxis: {},
-  series: [
-    {
-      name: '销量',
-      type: 'bar',
-      data: [5, 20, 36, 10, 10, 20]
-    }
-  ]
-})
+let myChart: any
 
-const initChart = function () {
-  const myChart = proxy.$Echarts.init(chart.value)
-  // 绘制图表
-  myChart.setOption(chartOptions)
+// 引入图表配置store
+const configStore = useConfigStore()
+
+// 图表配置项
+const chartOptions = computed(() => configStore.chartConfig)
+
+// 初始化图表
+const initChart = () => {
+  myChart = proxy.$Echarts.init(chart.value)
+  myChart.setOption(chartOptions.value)
 }
+
+// 更新图表
+const updateChart = () => {
+  myChart.setOption(chartOptions.value)
+}
+
+watch(
+  () => chartOptions.value,
+  () => {
+    updateChart()
+    console.log('update', chartOptions.value)
+  },
+  {
+    deep: true
+  }
+)
+
 onMounted(() => {
   initChart()
 })

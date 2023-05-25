@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-aside width="200px"><SidebarMenu /></el-aside>
+    <el-aside width="400px"><SidebarMenu /></el-aside>
     <el-container>
       <el-header>Header</el-header>
       <el-main> <RouterView /></el-main>
